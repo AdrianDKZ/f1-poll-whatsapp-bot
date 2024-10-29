@@ -31,6 +31,8 @@ def handler(client: NewClient, message: MessageEv):
             text = list(filter(lambda x: x != "", text.lower().split("\n")))
             print(text)
             comando = text[0].split(" ")[0]
+            if comando not in INDEXER.keys():
+                comando = "#ayuda"
             client.reply_message(INDEXER[comando](text, user), message)
             
 
