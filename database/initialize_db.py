@@ -1,7 +1,7 @@
 import sqlite3
 
 # Conecta a la base de datos
-conn = sqlite3.connect('Porra2024.db')
+conn = sqlite3.connect('database/Porra2024.sqlite3')
 cursor = conn.cursor()
 
 # Crea la tabla gp
@@ -40,7 +40,7 @@ cursor.execute("""
         id INTEGER PRIMARY KEY,
         sesion_id INTEGER NOT NULL,
         usuario_id INTEGER NOT NULL,
-        resultado TEXT NOT NULL,
+        prediccion TEXT NOT NULL,
         FOREIGN KEY (sesion_id) REFERENCES sesiones(id),
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
     );
