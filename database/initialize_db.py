@@ -21,7 +21,7 @@ cursor.execute("""
         gp_id INTEGER NOT NULL,
         fecha DATE NOT NULL,
         hora TIME NOT NULL,
-        tipo TEXT NOT NULL CHECK (tipo IN ('Sprint', 'Sprint Qaly', 'Qaly', 'Carrera')),
+        tipo TEXT NOT NULL CHECK (tipo IN ('libres', 'sprint', 'squaly', 'qualy', 'carrera')),
         FOREIGN KEY (gp_id) REFERENCES gp(id)
     );
 """)
@@ -70,11 +70,20 @@ cursor.execute("""
     );
 """)
 
-# # Inserta un nuevo GP
-# cursor.execute("INSERT INTO gp (nombre, fecha_inicio, fecha_fin) VALUES ('Gran Premio de España', '2024-04-12', '2024-04-14')")
+# Inserta un nuevo GP
+cursor.execute("INSERT INTO gp (nombre, fecha_inicio, fecha_fin) VALUES ('Gran Premio de Pasadolandia', '2024-04-12', '2024-04-14')")
+cursor.execute("INSERT INTO gp (nombre, fecha_inicio, fecha_fin) VALUES ('Gran Premio de Presentelandia', '2024-10-01', '2024-11-30')")
 
-# # Inserta una nueva sesión
-# cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (1, '2024-04-12', '10:30:00', 'Sprint')")
+
+# Inserta una nueva sesión
+cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'libres')")
+cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'squaly')")
+cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'sprint')")
+cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'qualy')")
+cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'carrera')")
+
+conn.commit()
+
 
 # # Inserta un nuevo usuario
 # cursor.execute("INSERT INTO usuarios (nombre) VALUES ('Juan')")
