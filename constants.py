@@ -22,3 +22,12 @@ PILOTS = {
     "MAG": ["kevin", "magunussen", "mag"]
 }
 
+ERRORS = {
+    "GP": "!No se ha encontrado ningun GP activo en la fecha de hoy"
+}
+
+TRANSLATE = {
+    "Friday": "Viernes",
+    "Saturday": "Sabado",
+    "Sunday": "Domingo"
+}

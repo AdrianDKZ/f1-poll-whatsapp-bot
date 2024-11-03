@@ -1,6 +1,7 @@
 import re
 
-from info import PILOTS
+import commit_database
+from constants import PILOTS
 
 def show_help(msg: list, user: str):
     return ("!Comandos whatsapp-milf-bot:" 
@@ -8,7 +9,7 @@ def show_help(msg: list, user: str):
             + "\n\t#Sprint \n\t#Resultado \n\t#Plantilla [qualy, carrera, sprint, squaly]")
 
 def show_times(msg: list, user: str):
-    pass
+    return commit_database.obtain_times()
 
 def show_template(msg: list, user: str):
     if "qualy" in msg[0]:
@@ -35,8 +36,9 @@ def set_poll(msg: list, user: str):
                 pred_dict[pred_info[0]] = next((pilot_id for pilot_id, pilot_names in PILOTS.items() if pred_info[1].replace(" ", "") in pilot_names))
         except (StopIteration, ValueError):
             return f"!Error en el procesamiento de _{prediction}_"
-    ## TBD: procesamiento y guardado de los datos
-    return "!Predicción guardada"#: \n" + '\n'.join(f"{key}- {pred_dict[key]}" for key in sorted(pred_dict.keys())) futuro formato para imprimir predicciones
+    return commit_database.store_poll(pred_dict, session, user) 
+
+#: \n" + '\n'.join(f"{key}- {pred_dict[key]}" for key in sorted(pred_dict.keys())) futuro formato para imprimir predicciones
 
 def set_results(msg: list, user: str):
     pass

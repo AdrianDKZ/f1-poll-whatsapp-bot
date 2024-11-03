@@ -1,33 +1,71 @@
 import sqlite3, json, datetime
+import locale
 
-# Conecta a la base de datos
-conn = sqlite3.connect('database/Porra2024.sqlite3')
-cursor = conn.cursor()
+import constants
+
+# Set the Spanish locale
+locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+
+def connect_sql():
+    global conn, cursor
+    conn = sqlite3.connect('database/Porra2024.sqlite3')
+    cursor = conn.cursor()
 
 def current_gp():
     today = datetime.date.today()
     cursor.execute("SELECT * FROM gp WHERE fecha_inicio <= ? AND fecha_fin >= ?", (today, today))
-    gp = cursor.fetchone()
-    return gp[0] if gp else False
+    return cursor.fetchone()
 
 def current_session(gp_id, session_type):
     cursor.execute("SELECT * FROM sesiones WHERE gp_id = ? AND tipo = ?", (gp_id, session_type))
-    session = cursor.fetchone()
-    return session[0] if session else False
+    return cursor.fetchone()
 
+def all_sessions(gp_id):
+    cursor.execute("SELECT * FROM sesiones WHERE gp_id = ?", (gp_id,))
+    return cursor.fetchall()
 
 def store_poll(prediction, session, user):
+    connect_sql()
     ## Identify user in DB and insert it if not exists
     cursor.execute("SELECT * FROM usuarios WHERE telefono = ?", (user,))
     user_id = cursor.fetchone()
     if not user_id:
         cursor.execute("INSERT INTO usuarios (telefono) VALUES (?)", (user,))
+        conn.commit()
     user_id = cursor.lastrowid if not user_id else user_id[0]
 
-    cursor.execute("INSERT INTO predicciones (sesion, usuario_id, prediccion) VALUES (?, ?, ?)",
-               (session, user, json.dumps(prediction)))
+    ## Get current Grand Prix and the GP Session
+    gp_id = current_gp()
+    if not gp_id:
+        return constants.ERRORS["GP"]
+    session_id = current_session(gp_id[0], session)
+    if not session_id:
+        return "!No se ha encontrado la sesión indicada"
+    
+    ## Check if entry for user and session exists
+    cursor.execute("SELECT * FROM predicciones WHERE sesion_id = ? AND usuario_id = ?", (session_id[0], user_id))
+    db_entry = cursor.fetchone()
+
+    if not db_entry:
+        cursor.execute("INSERT INTO predicciones (sesion_id, usuario_id, prediccion) VALUES (?, ?, ?)",
+                (session_id[0], user_id, json.dumps(prediction)))
+    else:
+        cursor.execute("UPDATE predicciones SET prediccion = ? WHERE id = ?", (json.dumps(prediction), db_entry[0]))
     conn.commit()
+    return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
+   
 
+def obtain_times():
+    connect_sql()
+    ## Get current Grand Prix and the GP Session
+    gp_id = current_gp()
+    if not gp_id:
+        return constants.ERRORS["GP"]
+    sessions = all_sessions(gp_id[0])
 
-x = current_gp()
-current_session(x, "qualy")
+    format_date = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A %d').capitalize()
+    format_time = lambda time: datetime.datetime.strptime(time, '%H:%M:%S').strftime('%H:%M')
+
+    ## GP_Name + [session_name: session_date session_time]
+    return (f"{gp_id[1]}\n" + 
+            "\n".join(f"{session[4].capitalize()}: {format_date(session[2])} - {format_time(session[3])}" for session in sessions))   
