@@ -26,8 +26,5 @@ ERRORS = {
     "GP": "!No se ha encontrado ningun GP activo en la fecha de hoy"
 }
 
-TRANSLATE = {
-    "Friday": "Viernes",
-    "Saturday": "Sabado",
-    "Sunday": "Domingo"
-}
+SESSIONS = ["qualy", "carrera", "sprint", "squaly"]
+SESSIONS_STR = '[' + ', '.join(SESSIONS) + ']'

@@ -16,8 +16,14 @@ def current_gp():
     cursor.execute("SELECT * FROM gp WHERE fecha_inicio <= ? AND fecha_fin >= ?", (today, today))
     return cursor.fetchone()
 
-def current_session(gp_id, session_type):
+def gp_session(gp_id, session_type):
     cursor.execute("SELECT * FROM sesiones WHERE gp_id = ? AND tipo = ?", (gp_id, session_type))
+    return cursor.fetchone()
+
+def current_session(gp_id, session_type):
+    now = datetime.datetime.now()
+    cursor.execute("SELECT * FROM sesiones WHERE gp_id = ? AND tipo = ? AND fecha <= ? AND hora < ?", 
+                   (gp_id, session_type, now.date(), now.time()))
     return cursor.fetchone()
 
 def all_sessions(gp_id):
@@ -40,7 +46,7 @@ def store_poll(prediction, session, user):
         return constants.ERRORS["GP"]
     session_id = current_session(gp_id[0], session)
     if not session_id:
-        return "!No se ha encontrado la sesión indicada"
+        return "!La sesión indicada no se ha encontrado o ha comenzado ya"
     
     ## Check if entry for user and session exists
     cursor.execute("SELECT * FROM predicciones WHERE sesion_id = ? AND usuario_id = ?", (session_id[0], user_id))
@@ -54,6 +60,22 @@ def store_poll(prediction, session, user):
     conn.commit()
     return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
    
+def store_results(prediction, session):
+    connect_sql()
+
+    ## Get current Grand Prix and the GP Session
+    gp_id = current_gp()
+    if not gp_id:
+        return constants.ERRORS["GP"]
+    session_id = gp_session(gp_id[0], session)
+    if not session_id:
+        return "!La sesión indicada no se encuentra"
+    
+    cursor.execute("UPDATE sesiones SET resultado = ? WHERE id = ?", (json.dumps(prediction), session_id[0]))
+    conn.commit()
+
+    return "!Resultados guardados"
+
 
 def obtain_times():
     connect_sql()
@@ -68,4 +90,4 @@ def obtain_times():
 
     ## GP_Name + [session_name: session_date session_time]
     return (f"{gp_id[1]}\n" + 
-            "\n".join(f"{session[4].capitalize()}: {format_date(session[2])} - {format_time(session[3])}" for session in sessions))   
+            "\n".join(f"*{session[4].capitalize()}*: _{format_date(session[2])} {format_time(session[3])}_" for session in sessions))   
