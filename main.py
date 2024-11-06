@@ -3,7 +3,7 @@ from neonize.events import ConnectedEv, MessageEv, PairStatusEv, event
 from neonize.types import MessageServerID
 from datetime import timedelta
 
-from commands import INDEXER, MessageInfo
+from commands import INDEXER, MessageObj
 
 
 client = NewClient("database.sqlite3")
@@ -24,7 +24,7 @@ def on_message(client: NewClient, message: MessageEv):
         if text[0] == "#":
             ## Get sender ID
             user = message_source.Sender.User
-            info = MessageInfo(client, message, user, text)
+            info = MessageObj(client, message, user, text)
             INDEXER[info.command](info)
             
 client.connect()

@@ -18,7 +18,7 @@ class MessageObj():
         self.input = text[1:]
         ## Obtain command and subcommand if exists. If not correct, invoke help function
         full_command = text[0].split(" ")
-        self.command = full_command[0][1:] if full_command[0] in INDEXER.keys() else "ayuda"
+        self.command = full_command[0][1:] if full_command[0][1:] in INDEXER.keys() else "ayuda"
         self.subcommand = full_command[1] if len(full_command) > 1 else None
 
     def reply(self, response):
