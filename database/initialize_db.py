@@ -19,8 +19,7 @@ cursor.execute("""
     CREATE TABLE IF NOT EXISTS sessions (
         id INTEGER PRIMARY KEY,
         gp_id INTEGER NOT NULL,
-        date DATE NOT NULL,
-        time TIME NOT NULL,
+        datetime DATETIME NOT NULL,
         type TEXT NOT NULL CHECK (type IN ('libres', 'sprint', 'squaly', 'qualy', 'carrera')),
         result TEXT,
         FOREIGN KEY (gp_id) REFERENCES gp(id)
@@ -59,11 +58,11 @@ cursor.execute("INSERT INTO gp (name, date_start, date_finish) VALUES ('Gran Pre
 
 
 # Inserta una nueva sesión
-cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'libres')")
-cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'squaly')")
-cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'sprint')")
-cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'qualy')")
-cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'carrera')")
+cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'libres')")
+cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'squaly')")
+cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'sprint')")
+cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'qualy')")
+cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-11-08 10:30:00', 'carrera')")
 
 conn.commit()
 

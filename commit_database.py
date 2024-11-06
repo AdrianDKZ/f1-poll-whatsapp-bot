@@ -22,8 +22,8 @@ def gp_session(gp_id, session_type):
 
 def current_session(gp_id, session_type):
     now = datetime.datetime.now()
-    cursor.execute("SELECT * FROM sessions WHERE gp_id = ? AND type = ? AND date <= ? AND time < ?", 
-                   (gp_id, session_type, now.date(), now.time()))
+    cursor.execute("SELECT * FROM sessions WHERE gp_id = ? AND type = ? AND datetime > ?", 
+                   (gp_id, session_type, now.strftime('%Y-%m-%d %H:%M:%S')))
     return cursor.fetchone()
 
 def all_sessions(gp_id):
@@ -85,9 +85,8 @@ def obtain_times():
         return constants.ERRORS["GP"]
     sessions = all_sessions(gp_id[0])
 
-    format_date = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A %d').capitalize()
-    format_time = lambda time: datetime.datetime.strptime(time, '%H:%M:%S').strftime('%H:%M')
+    format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
 
     ## GP_Name + [session_name: session_date session_time]
-    return (f"{gp_id[1]}\n" + 
-            "\n".join(f"*{session[4].capitalize()}*: _{format_date(session[2])} {format_time(session[3])}_" for session in sessions))   
+    return (f"*{gp_id[1]}*\n" + 
+            "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in sessions))   
