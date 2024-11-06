@@ -13,30 +13,30 @@ def connect_sql():
 
 def current_gp():
     today = datetime.date.today()
-    cursor.execute("SELECT * FROM gp WHERE fecha_inicio <= ? AND fecha_fin >= ?", (today, today))
+    cursor.execute("SELECT * FROM gp WHERE date_start <= ? AND date_finish >= ?", (today, today))
     return cursor.fetchone()
 
 def gp_session(gp_id, session_type):
-    cursor.execute("SELECT * FROM sesiones WHERE gp_id = ? AND tipo = ?", (gp_id, session_type))
+    cursor.execute("SELECT * FROM sessions WHERE gp_id = ? AND type = ?", (gp_id, session_type))
     return cursor.fetchone()
 
 def current_session(gp_id, session_type):
     now = datetime.datetime.now()
-    cursor.execute("SELECT * FROM sesiones WHERE gp_id = ? AND tipo = ? AND fecha <= ? AND hora < ?", 
+    cursor.execute("SELECT * FROM sessions WHERE gp_id = ? AND type = ? AND date <= ? AND time < ?", 
                    (gp_id, session_type, now.date(), now.time()))
     return cursor.fetchone()
 
 def all_sessions(gp_id):
-    cursor.execute("SELECT * FROM sesiones WHERE gp_id = ?", (gp_id,))
+    cursor.execute("SELECT * FROM sessions WHERE gp_id = ?", (gp_id,))
     return cursor.fetchall()
 
 def store_poll(prediction, session, user):
     connect_sql()
     ## Identify user in DB and insert it if not exists
-    cursor.execute("SELECT * FROM usuarios WHERE telefono = ?", (user,))
+    cursor.execute("SELECT * FROM users WHERE telephone = ?", (user,))
     user_id = cursor.fetchone()
     if not user_id:
-        cursor.execute("INSERT INTO usuarios (telefono) VALUES (?)", (user,))
+        cursor.execute("INSERT INTO users (telephone) VALUES (?)", (user,))
         conn.commit()
     user_id = cursor.lastrowid if not user_id else user_id[0]
 
@@ -49,14 +49,14 @@ def store_poll(prediction, session, user):
         return "!La sesión indicada no se ha encontrado o ha comenzado ya"
     
     ## Check if entry for user and session exists
-    cursor.execute("SELECT * FROM predicciones WHERE sesion_id = ? AND usuario_id = ?", (session_id[0], user_id))
+    cursor.execute("SELECT * FROM predictions WHERE session_id = ? AND user_id = ?", (session_id[0], user_id))
     db_entry = cursor.fetchone()
 
     if not db_entry:
-        cursor.execute("INSERT INTO predicciones (sesion_id, usuario_id, prediccion) VALUES (?, ?, ?)",
+        cursor.execute("INSERT INTO predictions (session_id, user_id, prediction) VALUES (?, ?, ?)",
                 (session_id[0], user_id, json.dumps(prediction)))
     else:
-        cursor.execute("UPDATE predicciones SET prediccion = ? WHERE id = ?", (json.dumps(prediction), db_entry[0]))
+        cursor.execute("UPDATE predictions SET prediction = ? WHERE id = ?", (json.dumps(prediction), db_entry[0]))
     conn.commit()
     return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
    
@@ -71,7 +71,7 @@ def store_results(prediction, session):
     if not session_id:
         return "!La sesión indicada no se encuentra"
     
-    cursor.execute("UPDATE sesiones SET resultado = ? WHERE id = ?", (json.dumps(prediction), session_id[0]))
+    cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id[0]))
     conn.commit()
 
     return "!Resultados guardados"

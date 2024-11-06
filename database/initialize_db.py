@@ -8,79 +8,62 @@ cursor = conn.cursor()
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS gp (
         id INTEGER PRIMARY KEY,
-        nombre TEXT NOT NULL,
-        fecha_inicio DATE NOT NULL,
-        fecha_fin DATE NOT NULL
+        name TEXT NOT NULL,
+        date_start DATE NOT NULL,
+        date_finish DATE NOT NULL
     );
 """)
 
 # Crea la tabla sesiones
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS sesiones (
+    CREATE TABLE IF NOT EXISTS sessions (
         id INTEGER PRIMARY KEY,
         gp_id INTEGER NOT NULL,
-        fecha DATE NOT NULL,
-        hora TIME NOT NULL,
-        tipo TEXT NOT NULL CHECK (tipo IN ('libres', 'sprint', 'squaly', 'qualy', 'carrera')),
+        date DATE NOT NULL,
+        time TIME NOT NULL,
+        type TEXT NOT NULL CHECK (type IN ('libres', 'sprint', 'squaly', 'qualy', 'carrera')),
+        result TEXT,
         FOREIGN KEY (gp_id) REFERENCES gp(id)
     );
 """)
+## Necesitamos una columna mas con los resultados de la sesion
 
 # Crea la tabla usuarios
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS usuarios (
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
-        telefono TEXT NOT NULL
+        telephone TEXT NOT NULL,
+        points INTEGER DEFAULT 0 NOT NULL,
+        strikes INTEGER DEFAULT 0 NOT NULL
     );
 """)
 
 # Crea la tabla predicciones
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS predicciones (
+    CREATE TABLE IF NOT EXISTS predictions (
         id INTEGER PRIMARY KEY,
-        sesion_id INTEGER NOT NULL,
-        usuario_id INTEGER NOT NULL,
-        prediccion TEXT NOT NULL,
-        FOREIGN KEY (sesion_id) REFERENCES sesiones(id),
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        session_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        prediction TEXT NOT NULL,
+        points INTEGER DEFAULT 0,
+        stored INTEGER DEFAULT 0 CHECK(stored IN (0, 1)),
+        FOREIGN KEY (session_id) REFERENCES sessions(id),
+        FOREIGN KEY (user_id) REFERENCES users(id)
     );
 """)
-
-# Crea la tabla resultados
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS resultados (
-        id INTEGER PRIMARY KEY,
-        sesion_id INTEGER NOT NULL,
-        usuario_id INTEGER NOT NULL,
-        puntuacion INTEGER NOT NULL,
-        FOREIGN KEY (sesion_id) REFERENCES sesiones(id),
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-    );
-""")
-
-# Crea la tabla puntuaciones_totales
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS puntuaciones_totales (
-        usuario_id INTEGER NOT NULL,
-        gp_id INTEGER NOT NULL,
-        puntuacion INTEGER NOT NULL,
-        PRIMARY KEY (usuario_id, gp_id),
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-        FOREIGN KEY (gp_id) REFERENCES gp(id)
-    );
-""")
+## stored: boolean type. to be used only with 0 or 1
 
 # Inserta un nuevo GP
-cursor.execute("INSERT INTO gp (nombre, fecha_inicio, fecha_fin) VALUES ('Gran Premio de Pasadolandia', '2024-04-12', '2024-04-14')")
-cursor.execute("INSERT INTO gp (nombre, fecha_inicio, fecha_fin) VALUES ('Gran Premio de Presentelandia', '2024-10-01', '2024-11-30')")
+cursor.execute("INSERT INTO gp (name, date_start, date_finish) VALUES ('Gran Premio de Pasadolandia', '2024-04-12', '2024-04-14')")
+cursor.execute("INSERT INTO gp (name, date_start, date_finish) VALUES ('Gran Premio de Presentelandia', '2024-10-01', '2024-11-30')")
 
 
 # Inserta una nueva sesión
-cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'libres')")
-cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'squaly')")
-cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'sprint')")
-cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'qualy')")
-cursor.execute("INSERT INTO sesiones (gp_id, fecha, hora, tipo) VALUES (2, '2024-04-12', '10:30:00', 'carrera')")
+cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'libres')")
+cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'squaly')")
+cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'sprint')")
+cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'qualy')")
+cursor.execute("INSERT INTO sessions (gp_id, date, time, type) VALUES (2, '2024-04-12', '10:30:00', 'carrera')")
 
 conn.commit()
 
