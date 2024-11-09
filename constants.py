@@ -23,7 +23,15 @@ PILOTS = {
 }
 
 ERRORS = {
-    "GP": "!No se ha encontrado ningun GP activo en la fecha de hoy"
+    "GP404": "!No se ha encontrado ningun GP activo en la fecha de hoy",
+    "SES404": "!La sesión indicada no se encuentra"
+}
+
+TEMPLATE = {
+    "squaly":  "1- ",
+    "sprint":  "1- ",
+    "qualy":   "1- \nALO- ",
+    "carrera": "1- \n2- \n3- \nALO- "    
 }
 
 SESSIONS = ["qualy", "carrera", "sprint", "squaly"]

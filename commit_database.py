@@ -30,8 +30,21 @@ def all_sessions(gp_id):
     cursor.execute("SELECT * FROM sessions WHERE gp_id = ?", (gp_id,))
     return cursor.fetchall()
 
-def store_poll(prediction, session, user):
+def common_checks(session, get_session):
     connect_sql()
+    ## Get current Grand Prix and the GP Session
+    gp_id = current_gp()
+    if not gp_id:
+        return "!No se ha encontrado ningun GP activo a fecha de hoy"
+    session_id = get_session(gp_id[0], session)
+    if not session_id:
+        return "!La sesión indicada no se encuentra"
+    return session_id[0]
+
+def store_poll(prediction, session, user):
+    session_id = common_checks(session, current_session)
+    if isinstance(session_id, str):
+        return session_id
     ## Identify user in DB and insert it if not exists
     cursor.execute("SELECT * FROM users WHERE telephone = ?", (user,))
     user_id = cursor.fetchone()
@@ -40,41 +53,44 @@ def store_poll(prediction, session, user):
         conn.commit()
     user_id = cursor.lastrowid if not user_id else user_id[0]
 
-    ## Get current Grand Prix and the GP Session
-    gp_id = current_gp()
-    if not gp_id:
-        return constants.ERRORS["GP"]
-    session_id = current_session(gp_id[0], session)
-    if not session_id:
-        return "!La sesión indicada no se ha encontrado o ha comenzado ya"
-    
     ## Check if entry for user and session exists
-    cursor.execute("SELECT * FROM predictions WHERE session_id = ? AND user_id = ?", (session_id[0], user_id))
+    cursor.execute("SELECT * FROM predictions WHERE session_id = ? AND user_id = ?", (session_id, user_id))
     db_entry = cursor.fetchone()
-
     if not db_entry:
         cursor.execute("INSERT INTO predictions (session_id, user_id, prediction) VALUES (?, ?, ?)",
-                (session_id[0], user_id, json.dumps(prediction)))
+                (session_id, user_id, json.dumps(prediction)))
     else:
         cursor.execute("UPDATE predictions SET prediction = ? WHERE id = ?", (json.dumps(prediction), db_entry[0]))
     conn.commit()
     return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
    
 def store_results(prediction, session):
-    connect_sql()
-
-    ## Get current Grand Prix and the GP Session
-    gp_id = current_gp()
-    if not gp_id:
-        return constants.ERRORS["GP"]
-    session_id = gp_session(gp_id[0], session)
-    if not session_id:
-        return "!La sesión indicada no se encuentra"
+    session_id = common_checks(session, gp_session)
+    if isinstance(session_id, str):
+        return session_id
     
-    cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id[0]))
+    cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id))
     conn.commit()
 
     return "!Resultados guardados"
+
+def prediction_points(results, session):
+    session_id = common_checks(session, gp_session)
+    if isinstance(session_id, str):
+        return session_id   
+    ## Obtain all predictions made for session
+    cursor.execute("SELECT * FROM predictions WHERE session_id = ?", (session_id, ))
+    for prediction in cursor.fetchall():
+        ## Obtain user points and strikes
+        points, strike = get_points(prediction[3], results, session)
+        ## Update prediction points
+        cursor.execute("UPDATE predictions SET points = ?, stored = ? WHERE id = ?", (points, 1, prediction[0]))
+        ## Obtain historical points and strikes
+        cursor.execute("SELECT points, strikes FROM users WHERE id = ?", (prediction[2],))
+        user_info = cursor.fetchone()
+        ## Update total points and strikes
+        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE id = ?", (points+user_info[0], strike+user_info[1], prediction[2]))
+    conn.commit()
 
 
 def obtain_times():
@@ -90,3 +106,19 @@ def obtain_times():
     ## GP_Name + [session_name: session_date session_time]
     return (f"*{gp_id[1]}*\n" + 
             "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in sessions))   
+
+def get_points(prediction, results, session):
+    ## Strike is a boolean int, so it can be added outside the function
+    points, strike = 0, 1
+    prediction = json.loads(prediction)
+    for position, pilot in results.items():
+        ## Add point if hit
+        if prediction[position] == pilot:
+            points += 1
+        ## Strike to false if fail at a numeric position or not a race
+        elif position != "ALO" or session != "carrera":
+            strike = 0
+    ## Two extra points if strike
+    points += 2 if strike else 0
+    return points, strike
+    
