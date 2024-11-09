@@ -80,18 +80,28 @@ def prediction_points(results, session):
         return session_id   
     ## Obtain all predictions made for session
     cursor.execute("SELECT * FROM predictions WHERE session_id = ?", (session_id, ))
+    resultados = "*Puntos obtenidos*"
     for prediction in cursor.fetchall():
         ## Obtain user points and strikes
         points, strike = get_points(prediction[3], results, session)
         ## Update prediction points
         cursor.execute("UPDATE predictions SET points = ?, stored = ? WHERE id = ?", (points, 1, prediction[0]))
         ## Obtain historical points and strikes
-        cursor.execute("SELECT points, strikes FROM users WHERE id = ?", (prediction[2],))
+        cursor.execute("SELECT * FROM users WHERE id = ?", (prediction[2],))
         user_info = cursor.fetchone()
         ## Update total points and strikes
-        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE id = ?", (points+user_info[0], strike+user_info[1], prediction[2]))
+        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE id = ?", (points+user_info[2], strike+user_info[3], prediction[2]))
+        resultados += f"\n@{user_info[1]}: {points} pts."
     conn.commit()
+    return resultados      
 
+## TBD: devolver los resultados totales tras la prediccion
+
+## TBD: control de errores. podemos volver a indicar el resultado si cambios
+    ## - ibamos a usar la variable stored, pero quizas podriamos iniciar points como null para saber si es la primera vez o
+    ## no que se suma el valor
+    ## - podriamos cambiar el stored por strike ya que lo tenemos, aunque otra opcion es >= 5 puntos obtenidos
+    ## - en este caso, tenemos que restar los puntos anteriormente guardados en users antes de volver a sumar los nuevos
 
 def obtain_times():
     connect_sql()

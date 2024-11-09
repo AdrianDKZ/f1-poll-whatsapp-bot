@@ -7,10 +7,11 @@ import constants
 import commit_database
 
 class MessageObj():
-    def __init__(self, client: NewClient, message: MessageEv, user, text):
+    def __init__(self, client: NewClient, message: MessageEv, chat, user, text):
         self.client = client
         self.user = user
         self.message = message
+        self.chat = chat
 
         ## Convert text to lowercase, split by line and delete empty ones
         text = list(filter(lambda x: x != "", text.lower().split("\n")))
@@ -56,7 +57,7 @@ def set_poll(msg: MessageObj):
     
     if msg.command == "resultado":
         msg.reply(commit_database.store_results(prediction, session))
-        commit_database.prediction_points(prediction, session)
+        msg.client.send_message(msg.chat, commit_database.prediction_points(prediction, session))
         ## Necesitamos otro comando con el que emviar un mensaje con los resultados de la prediccion
         ## Ademas, otro mas con los resultados actualizados de la clasificacion general
     else:
@@ -84,6 +85,7 @@ def parse_prediction(msg: list, session: str):
     return prediction
 
 INDEXER = {
+    "hola": None,
     "ayuda": show_help,
     "horario": show_times,
     "qualy": set_poll,
@@ -91,5 +93,6 @@ INDEXER = {
     "sprint": set_poll,
     "squaly": set_poll,
     "resultado": set_poll,
-    "plantilla": show_template
+    "plantilla": show_template,
+    "clasificacion": None
 }

@@ -4,6 +4,7 @@ from neonize.types import MessageServerID
 from datetime import timedelta
 
 from commands import INDEXER, MessageObj
+from constants import CHAT_ID
 
 
 client = NewClient("database.sqlite3")
@@ -17,14 +18,14 @@ def on_message(client: NewClient, message: MessageEv):
     print(message)
     message_source = message.Info.MessageSource
     ## Secure we are in a group and its ID is the correct one
-    if message_source.IsGroup and message_source.Chat.User == "120363349774885451": #120363021965478012
+    if message_source.IsGroup and message_source.Chat.User == CHAT_ID:
         ## Retrieve message
         text = message.Message.conversation or message.Message.extendedTextMessage.text
         ## Commands will start by #
         if text[0] == "#":
             ## Get sender ID
             user = message_source.Sender.User
-            info = MessageObj(client, message, user, text)
+            info = MessageObj(client, message, message_source.Chat, user, text)
             INDEXER[info.command](info)
             
 client.connect()

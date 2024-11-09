@@ -1,4 +1,5 @@
-
+CHAT_ID = "120363349774885451" #120363021965478012
+    
 PILOTS = {
     "HAM": ["lewis", "hamilton", "ham"],
     "RUS": ["george", "russell", "rus"],
