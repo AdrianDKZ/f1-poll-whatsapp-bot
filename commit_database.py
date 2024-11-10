@@ -106,6 +106,16 @@ def poll_points():
     users_lst = sorted(cursor.fetchall(), key=lambda x: (-x[2], -x[3]))
     return "*Porra Individual*\n" + "\n".join(f"{user[1]} - {user[2]} puntos ({user[3]})" for user in users_lst)
 
+def team_points():
+    connect_sql()
+    cursor.execute("SELECT * FROM teams")
+    teams_info = []
+    for team in cursor.fetchall():
+        user1, user2 = obtain_user(team[2]), obtain_user(team[3])
+        teams_info.append((team[1], user1[1], user2[1], user1[2]+user2[2], user1[3]+user2[3]))
+    teams_info = sorted(teams_info, key=lambda x: (-x[3], -x[4]))
+    return "*Porra por Equipos*\n" + "\n".join(f"{team[0]} ({team[1]} y {team[2]}) - {team[3]} puntos ({team[4]})" for team in teams_info)
+
 def obtain_times():
     connect_sql()
     ## Get current Grand Prix and the GP Session

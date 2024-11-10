@@ -25,20 +25,17 @@ class MessageObj():
     def reply(self, response):
         self.client.reply_message(response, self.message)
 
-def hello(msg: MessageObj):
-    msg.reply("!Hola! Soy _milf-bot_, un asistente para gestionar las porras de F1." +
-              "¿Quieres saber lo que puedo hacer? Escribe *#ayuda*")
-
 def show_help(msg: MessageObj):
     msg.reply("!Comandos whatsapp-milf-bot:" 
-            + "\n\t#Ayuda \n\t#Horario \n\t#Qualy \n\t#SQualy \n\t#Carrera \n\t#Sprint"
-            + f"\n\t#Resultado {constants.SESSIONS_STR} \n\t#Plantilla {constants.SESSIONS_STR}")
+            + "\n\t#Ayuda \n\t#Horario \n\t#Porra \n\t#SQualy \n\t#Sprint \n\t#Qualy \n\t#Carrera "
+            + f"\n\t#Resultado _{constants.SESSIONS_STR}_ \n\t#Plantilla _{constants.SESSIONS_STR}_")
 
 def show_times(msg: MessageObj):
     msg.reply(commit_database.obtain_times())
 
 def show_poll(msg: MessageObj):
     msg.reply(commit_database.poll_points())
+    msg.reply(commit_database.team_points())
 
 def show_template(msg: MessageObj):
     if msg.subcommand in constants.TEMPLATE.keys():
@@ -64,6 +61,7 @@ def set_poll(msg: MessageObj):
     if msg.command == "resultado":
         msg.reply(commit_database.prediction_points(prediction, session))
         msg.client.send_message(msg.chat, commit_database.poll_points())
+        msg.client.send_message(msg.chat, commit_database.team_points())
     else:
         msg.reply(commit_database.store_poll(prediction, session, msg.user))
 
@@ -87,7 +85,6 @@ def parse_prediction(msg: list, session: str):
     return prediction
 
 INDEXER = {
-    "hola": hello,
     "ayuda": show_help,
     "horario": show_times,
     "qualy": set_poll,

@@ -37,6 +37,17 @@ cursor.execute("""
     );
 """)
 
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS teams (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        user1 TEXT,
+        user2 TEXT,
+        FOREIGN KEY (user1) REFERENCES usuarios(id),
+        FOREIGN KEY (user2) REFERENCES usuarios(id)
+    );
+''')
+
 # Crea la tabla predicciones
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS predictions (
@@ -62,6 +73,8 @@ cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04
 cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'sprint')")
 cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-11-09 10:30:00', 'qualy')")
 cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-11-15 10:30:00', 'carrera')")
+
+cursor.execute("INSERT INTO teams (name, user1, user2) VALUES ('Nilo y Keni', '34604985611', '34635286932')")
 
 conn.commit()
 
