@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from commands import INDEXER, MessageObj
 from constants import CHAT_ID
+from commit_database import store_user
 
 
 client = NewClient("database.sqlite3")
@@ -25,6 +26,7 @@ def on_message(client: NewClient, message: MessageEv):
         if text[0] == "#":
             ## Get sender ID
             user = message_source.Sender.User
+            store_user(user, message.Info.Pushname)
             info = MessageObj(client, message, message_source.Chat, user, text)
             INDEXER[info.command](info)
             

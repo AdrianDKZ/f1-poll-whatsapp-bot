@@ -30,8 +30,8 @@ cursor.execute("""
 # Crea la tabla usuarios
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        telephone TEXT NOT NULL,
+        telephone TEXT NOT NULL PRIMARY KEY,
+        name TEXT NOT NULL,
         points INTEGER DEFAULT 0 NOT NULL,
         strikes INTEGER DEFAULT 0 NOT NULL
     );

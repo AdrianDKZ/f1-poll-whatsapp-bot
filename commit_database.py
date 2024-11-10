@@ -34,14 +34,17 @@ def store_results(prediction, session_id):
     cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id))
     conn.commit()
 
+def store_user(telephone, user_name):
+    connect_sql()
+    if not obtain_user(telephone):
+        user_name = f"@{telephone}" if user_name == "" else user_name.split(" ")[0]
+        cursor.execute("INSERT INTO users (telephone, name) VALUES (?, ?)", (telephone, user_name))
+        conn.commit()
+
 def obtain_user(user):
     ## Identify user in DB and insert it if not exists
     cursor.execute("SELECT * FROM users WHERE telephone = ?", (user,))
-    user_id = cursor.fetchone()
-    if not user_id:
-        cursor.execute("INSERT INTO users (telephone) VALUES (?)", (user,))
-        conn.commit()
-    return cursor.lastrowid if not user_id else user_id[0]
+    return cursor.fetchone()
 
 def common_checks(session, get_session):
     connect_sql()
@@ -59,7 +62,7 @@ def store_poll(prediction, session, user):
     if isinstance(session_id, str):
         return session_id
     
-    user_id = obtain_user(user)
+    user_id = obtain_user(user)[0]
 
     ## Check if entry for user and session exists
     cursor.execute("SELECT * FROM predictions WHERE session_id = ? AND user_id = ?", (session_id, user_id))
@@ -90,11 +93,10 @@ def prediction_points(results, session):
         ## Update prediction points
         cursor.execute("UPDATE predictions SET points = ? WHERE id = ?", (points, prediction[0]))
         ## Obtain historical points and strikes
-        cursor.execute("SELECT * FROM users WHERE id = ?", (prediction[2],))
-        user_info = cursor.fetchone()
+        user_info = obtain_user(prediction[2])
         ## Update total points and strikes. Obtained points + Total points - Previous session points (normally this will be 0)
-        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE id = ?", (points+user_info[2]-prev_points, strike+user_info[3]-prev_strike, prediction[2]))
-        resultados += f"\n@{user_info[1]}: {points} pts."
+        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE telephone = ?", (points+user_info[2]-prev_points, strike+user_info[3]-prev_strike, prediction[2]))
+        resultados += f"\n{user_info[1]}: {points} pts."
     conn.commit()
     return resultados      
 
@@ -102,7 +104,7 @@ def poll_points():
     connect_sql()
     cursor.execute("SELECT * FROM users")
     users_lst = sorted(cursor.fetchall(), key=lambda x: (-x[2], -x[3]))
-    return "*Porra Individual*\n" + "\n".join(f"@{user[1]} - {user[2]} puntos ({user[3]})" for user in users_lst)
+    return "*Porra Individual*\n" + "\n".join(f"{user[1]} - {user[2]} puntos ({user[3]})" for user in users_lst)
 
 def obtain_times():
     connect_sql()
