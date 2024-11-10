@@ -30,6 +30,19 @@ def all_sessions(gp_id):
     cursor.execute("SELECT * FROM sessions WHERE gp_id = ?", (gp_id,))
     return cursor.fetchall()
 
+def store_results(prediction, session_id):
+    cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id))
+    conn.commit()
+
+def obtain_user(user):
+    ## Identify user in DB and insert it if not exists
+    cursor.execute("SELECT * FROM users WHERE telephone = ?", (user,))
+    user_id = cursor.fetchone()
+    if not user_id:
+        cursor.execute("INSERT INTO users (telephone) VALUES (?)", (user,))
+        conn.commit()
+    user_id = cursor.lastrowid if not user_id else user_id[0]
+
 def common_checks(session, get_session):
     connect_sql()
     ## Get current Grand Prix and the GP Session
@@ -45,13 +58,8 @@ def store_poll(prediction, session, user):
     session_id = common_checks(session, current_session)
     if isinstance(session_id, str):
         return session_id
-    ## Identify user in DB and insert it if not exists
-    cursor.execute("SELECT * FROM users WHERE telephone = ?", (user,))
-    user_id = cursor.fetchone()
-    if not user_id:
-        cursor.execute("INSERT INTO users (telephone) VALUES (?)", (user,))
-        conn.commit()
-    user_id = cursor.lastrowid if not user_id else user_id[0]
+    
+    user_id = obtain_user(user)
 
     ## Check if entry for user and session exists
     cursor.execute("SELECT * FROM predictions WHERE session_id = ? AND user_id = ?", (session_id, user_id))
@@ -63,21 +71,13 @@ def store_poll(prediction, session, user):
         cursor.execute("UPDATE predictions SET prediction = ? WHERE id = ?", (json.dumps(prediction), db_entry[0]))
     conn.commit()
     return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
-   
-def store_results(prediction, session):
-    session_id = common_checks(session, gp_session)
-    if isinstance(session_id, str):
-        return session_id
-    
-    cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id))
-    conn.commit()
-
-    return "!Resultados guardados"
 
 def prediction_points(results, session):
     session_id = common_checks(session, gp_session)
     if isinstance(session_id, str):
         return session_id   
+    ## Store session results
+    store_results(results, session_id)
     ## Obtain all predictions made for session
     cursor.execute("SELECT * FROM predictions WHERE session_id = ?", (session_id, ))
     resultados = "*Puntos obtenidos*"
@@ -95,13 +95,17 @@ def prediction_points(results, session):
     conn.commit()
     return resultados      
 
-## TBD: devolver los resultados totales tras la prediccion
-
 ## TBD: control de errores. podemos volver a indicar el resultado si cambios
     ## - ibamos a usar la variable stored, pero quizas podriamos iniciar points como null para saber si es la primera vez o
     ## no que se suma el valor
     ## - podriamos cambiar el stored por strike ya que lo tenemos, aunque otra opcion es >= 5 puntos obtenidos
     ## - en este caso, tenemos que restar los puntos anteriormente guardados en users antes de volver a sumar los nuevos
+
+def poll_points():
+    connect_sql()
+    cursor.execute("SELECT * FROM users")
+    users_lst = sorted(cursor.fetchall(), key=lambda x: (-x[2], -x[3]))
+    return "*Porra Individual*\n" + "\n".join(f"@{user[1]} - {user[2]} puntos ({user[3]})" for user in users_lst)
 
 def obtain_times():
     connect_sql()
@@ -131,4 +135,3 @@ def get_points(prediction, results, session):
     ## Two extra points if strike
     points += 2 if strike else 0
     return points, strike
-    

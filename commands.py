@@ -25,6 +25,9 @@ class MessageObj():
     def reply(self, response):
         self.client.reply_message(response, self.message)
 
+def hello(msg: MessageObj):
+    msg.reply("!Hola! Soy _milf-bot_, un asistente para gestionar las porras de F1." +
+              "¿Quieres saber lo que puedo hacer? Escribe *#ayuda*")
 
 def show_help(msg: MessageObj):
     msg.reply("!Comandos whatsapp-milf-bot:" 
@@ -33,6 +36,9 @@ def show_help(msg: MessageObj):
 
 def show_times(msg: MessageObj):
     msg.reply(commit_database.obtain_times())
+
+def show_poll(msg: MessageObj):
+    msg.reply(commit_database.poll_points())
 
 def show_template(msg: MessageObj):
     if msg.subcommand in constants.TEMPLATE.keys():
@@ -56,14 +62,10 @@ def set_poll(msg: MessageObj):
         return
     
     if msg.command == "resultado":
-        msg.reply(commit_database.store_results(prediction, session))
-        msg.client.send_message(msg.chat, commit_database.prediction_points(prediction, session))
-        ## Necesitamos otro comando con el que emviar un mensaje con los resultados de la prediccion
-        ## Ademas, otro mas con los resultados actualizados de la clasificacion general
+        msg.reply(commit_database.prediction_points(prediction, session))
+        msg.client.send_message(msg.chat, commit_database.poll_points())
     else:
         msg.reply(commit_database.store_poll(prediction, session, msg.user))
-
-#: \n" + '\n'.join(f"{key}- {pred_dict[key]}" for key in sorted(pred_dict.keys())) futuro formato para imprimir predicciones
 
 def parse_prediction(msg: list, session: str):
     ## Parse lines to obtain prediction
@@ -85,7 +87,7 @@ def parse_prediction(msg: list, session: str):
     return prediction
 
 INDEXER = {
-    "hola": None,
+    "hola": hello,
     "ayuda": show_help,
     "horario": show_times,
     "qualy": set_poll,
@@ -94,5 +96,5 @@ INDEXER = {
     "squaly": set_poll,
     "resultado": set_poll,
     "plantilla": show_template,
-    "clasificacion": None
+    "porra": show_poll
 }
