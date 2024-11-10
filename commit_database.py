@@ -41,7 +41,7 @@ def obtain_user(user):
     if not user_id:
         cursor.execute("INSERT INTO users (telephone) VALUES (?)", (user,))
         conn.commit()
-    user_id = cursor.lastrowid if not user_id else user_id[0]
+    return cursor.lastrowid if not user_id else user_id[0]
 
 def common_checks(session, get_session):
     connect_sql()
@@ -84,22 +84,19 @@ def prediction_points(results, session):
     for prediction in cursor.fetchall():
         ## Obtain user points and strikes
         points, strike = get_points(prediction[3], results, session)
+        ## Get previous points if result had already been indicated
+        prev_points = 0 if prediction[4] == None else prediction[4]
+        prev_strike = 1 if prev_points >= 5 else 0
         ## Update prediction points
-        cursor.execute("UPDATE predictions SET points = ?, stored = ? WHERE id = ?", (points, 1, prediction[0]))
+        cursor.execute("UPDATE predictions SET points = ? WHERE id = ?", (points, prediction[0]))
         ## Obtain historical points and strikes
         cursor.execute("SELECT * FROM users WHERE id = ?", (prediction[2],))
         user_info = cursor.fetchone()
-        ## Update total points and strikes
-        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE id = ?", (points+user_info[2], strike+user_info[3], prediction[2]))
+        ## Update total points and strikes. Obtained points + Total points - Previous session points (normally this will be 0)
+        cursor.execute("UPDATE users SET points = ?, strikes = ? WHERE id = ?", (points+user_info[2]-prev_points, strike+user_info[3]-prev_strike, prediction[2]))
         resultados += f"\n@{user_info[1]}: {points} pts."
     conn.commit()
     return resultados      
-
-## TBD: control de errores. podemos volver a indicar el resultado si cambios
-    ## - ibamos a usar la variable stored, pero quizas podriamos iniciar points como null para saber si es la primera vez o
-    ## no que se suma el valor
-    ## - podriamos cambiar el stored por strike ya que lo tenemos, aunque otra opcion es >= 5 puntos obtenidos
-    ## - en este caso, tenemos que restar los puntos anteriormente guardados en users antes de volver a sumar los nuevos
 
 def poll_points():
     connect_sql()

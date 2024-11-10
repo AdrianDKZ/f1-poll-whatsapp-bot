@@ -35,5 +35,5 @@ TEMPLATE = {
     "carrera": "1- \n2- \n3- \nALO- "    
 }
 
-SESSIONS = ["qualy", "carrera", "sprint", "squaly"]
+SESSIONS = ["squaly", "sprint", "qualy", "carrera"]
 SESSIONS_STR = '[' + ', '.join(SESSIONS) + ']'
