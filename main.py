@@ -1,12 +1,12 @@
 from neonize.client import NewClient
 from neonize.events import ConnectedEv, MessageEv, PairStatusEv, event
 from neonize.types import MessageServerID
-from datetime import timedelta
 
 from commands import INDEXER, MessageObj
 from constants import CHAT_ID
 from commit_database import store_user
 
+import threading
 
 client = NewClient("database.sqlite3")
 
@@ -27,11 +27,10 @@ def on_message(client: NewClient, message: MessageEv):
             ## Get sender ID
             user = message_source.Sender.User
             store_user(user, message.Info.Pushname)
-            info = MessageObj(client, message, message_source.Chat, user, text)
+            info = MessageObj(client, message, user, text)
             INDEXER[info.command](info)
             
 client.connect()
-
     # # print(message.Info.MessageSource.Sender.User)
     # chat = message.Info.MessageSource.Chat
 

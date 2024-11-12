@@ -30,6 +30,10 @@ def all_sessions(gp_id):
     cursor.execute("SELECT * FROM sessions WHERE gp_id = ?", (gp_id,))
     return cursor.fetchall()
 
+def session_predictions(session_id):
+    cursor.execute("SELECT * FROM predictions WHERE session_id = ?", (session_id, ))
+    return cursor.fetchall()
+
 def store_results(prediction, session_id):
     cursor.execute("UPDATE sessions SET result = ? WHERE id = ?", (json.dumps(prediction), session_id))
     conn.commit()
@@ -75,6 +79,21 @@ def store_poll(prediction, session, user):
     conn.commit()
     return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
 
+def obtain_polls(session_id):
+    connect_sql()
+    ## Obtain session info
+    cursor.execute("SELECT gp_id, type FROM sessions WHERE id = ?", (session_id,))
+    gp_id, session_type = cursor.fetchone()
+    cursor.execute("SELECT name FROM gp WHERE id = ?", (gp_id,))
+    gp_name = cursor.fetchone()[0]
+    preds_str = f"*{gp_name}* \n _{session_type.capitalize()}_"
+    for prediction in session_predictions(session_id):
+        user = obtain_user(prediction[2])
+        pred = json.loads(prediction[3])
+        user_pred_str = "\n".join(f"{position}-{pilot}" for position, pilot in pred.items())
+        preds_str += f"\n\n{user[1]}:\n{user_pred_str}"
+    return preds_str
+
 def prediction_points(results, session):
     session_id = common_checks(session, gp_session)
     if isinstance(session_id, str):
@@ -82,9 +101,8 @@ def prediction_points(results, session):
     ## Store session results
     store_results(results, session_id)
     ## Obtain all predictions made for session
-    cursor.execute("SELECT * FROM predictions WHERE session_id = ?", (session_id, ))
     resultados = "*Puntos obtenidos*"
-    for prediction in cursor.fetchall():
+    for prediction in session_predictions(session_id):
         ## Obtain user points and strikes
         points, strike = get_points(prediction[3], results, session)
         ## Get previous points if result had already been indicated
@@ -123,12 +141,7 @@ def obtain_times():
     if not gp_id:
         return constants.ERRORS["GP"]
     sessions = all_sessions(gp_id[0])
-
-    format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
-
-    ## GP_Name + [session_name: session_date session_time]
-    return (f"*{gp_id[1]}*\n" + 
-            "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in sessions))   
+    return gp_id[1], sessions
 
 def get_points(prediction, results, session):
     ## Strike is a boolean int, so it can be added outside the function

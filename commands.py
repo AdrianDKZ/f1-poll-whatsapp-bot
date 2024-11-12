@@ -1,17 +1,17 @@
-import re
+import re, datetime
 
 from neonize.client import NewClient
 from neonize.events import MessageEv
+from neonize.utils import build_jid
 
 import constants
 import commit_database
 
 class MessageObj():
-    def __init__(self, client: NewClient, message: MessageEv, chat, user, text):
+    def __init__(self, client: NewClient, message: MessageEv, user, text):
         self.client = client
         self.user = user
         self.message = message
-        self.chat = chat
 
         ## Convert text to lowercase, split by line and delete empty ones
         text = list(filter(lambda x: x != "", text.lower().split("\n")))
@@ -26,7 +26,7 @@ class MessageObj():
         self.client.reply_message(response, self.message)
 
     def send(self, message):
-        self.client.send_message(self.chat, message)
+        self.client.send_message(build_jid(constants.CHAT_ID, server="g.us"), message)
 
 def show_help(msg: MessageObj):
     msg.reply("!Comandos whatsapp-milf-bot:" 
@@ -41,7 +41,15 @@ def show_help(msg: MessageObj):
             + f"\n\t*#Plantilla _{constants.SESSIONS_STR}_* - Obtiene la plantilla de la sesión indicada")
 
 def show_times(msg: MessageObj):
-    msg.reply(commit_database.obtain_times())
+    times_info = commit_database.obtain_times()
+    if isinstance(times_info, str):
+        msg.reply(times_info)
+    else:
+        format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
+
+        ## GP_Name + [session_name: session_date session_time]
+        msg.reply(f"*{times_info[0]}*\n" + 
+                "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in times_info[1]))   
 
 def show_poll(msg: MessageObj):
     msg.reply(commit_database.poll_points())
