@@ -5,14 +5,18 @@ from neonize.types import MessageServerID
 from commands import INDEXER, MessageObj
 from constants import CHAT_ID
 from commit_database import store_user
+from schedule import schedule_runner
 
 import threading
 
 client = NewClient("database.sqlite3")
 
 @client.event(ConnectedEv)
-def on_connected(_: NewClient, __: ConnectedEv):
+def on_connected(newClient: NewClient, __: ConnectedEv):
     print("⚡ Connected")
+    thread = threading.Thread(target=schedule_runner, args=(newClient,))
+    thread.daemon = True
+    thread.start()
 
 @client.event(MessageEv)
 def on_message(client: NewClient, message: MessageEv):
