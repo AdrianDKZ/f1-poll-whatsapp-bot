@@ -1,0 +1,9 @@
+# docker-compose.yml
+
+version: '3'
+
+services:
+  milf-bot:
+    build: .
+    volumes:
+    - ./src/database:/app/database
