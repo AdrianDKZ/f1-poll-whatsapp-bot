@@ -60,26 +60,5 @@ cursor.execute("""
         FOREIGN KEY (user_id) REFERENCES users(id)
     );
 """)
-## stored: boolean type. to be used only with 0 or 1
-
-# Inserta un nuevo GP
-cursor.execute("INSERT INTO gp (name, date_start, date_finish) VALUES ('Gran Premio de Pasadolandia', '2024-04-12', '2024-04-14')")
-cursor.execute("INSERT INTO gp (name, date_start, date_finish) VALUES ('Gran Premio de Presentelandia', '2024-10-01', '2024-11-30')")
-
-
-# Inserta una nueva sesión
-cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'libres')")
-cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'squaly')")
-cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-04-12 10:30:00', 'sprint')")
-cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-11-09 10:30:00', 'qualy')")
-cursor.execute("INSERT INTO sessions (gp_id, datetime, type) VALUES (2, '2024-11-15 10:30:00', 'carrera')")
-
-cursor.execute("INSERT INTO teams (name, user1, user2) VALUES ('Nilo y Keni', '34604985611', '34635286932')")
 
 conn.commit()
-
-
-# # Inserta un nuevo usuario
-# cursor.execute("INSERT INTO usuarios (nombre) VALUES ('Juan')")
-
-# # Inserta

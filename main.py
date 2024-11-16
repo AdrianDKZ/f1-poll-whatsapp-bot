@@ -9,7 +9,7 @@ from schedule import schedule_runner
 
 import threading
 
-client = NewClient("database.sqlite3")
+client = NewClient("database/database.sqlite3")
 
 @client.event(ConnectedEv)
 def on_connected(newClient: NewClient, __: ConnectedEv):

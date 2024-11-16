@@ -90,7 +90,7 @@ def obtain_polls(session_id):
     for prediction in session_predictions(session_id):
         user = obtain_user(prediction[2])
         pred = json.loads(prediction[3])
-        user_pred_str = "\n".join(f"{position}-{pilot}" for position, pilot in pred.items())
+        user_pred_str = "\n".join(f"{position}- {pilot}" for position, pilot in pred.items())
         preds_str += f"\n\n{user[1]}:\n{user_pred_str}"
     return preds_str
 
@@ -139,7 +139,7 @@ def obtain_times():
     ## Get current Grand Prix and the GP Session
     gp_id = current_gp()
     if not gp_id:
-        return constants.ERRORS["GP"]
+        return constants.ERRORS["GP404"]
     sessions = all_sessions(gp_id[0])
     return gp_id[1], sessions
 
