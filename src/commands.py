@@ -43,9 +43,10 @@ def show_help(msg: MessageObj):
     
 def show_tips(msg: MessageObj):
     msg.reply("!Funcionamiento de _whatsapp-milf-bot_:"
-            + "\n\t - El bot detecta sólo los mensajes que empiezan por #"
-            + "\n\t - Las plantillas se envían con una ! delante. Hay que borrarla."
-            + "\n\t - Las semanas de GP comienzan el martes y terminan el lunes (incluidos)."
+            + "\n\t - El bot *solo* detecta los mensajes que empiezan por #"
+            + "\n\t - Las plantillas se envían con una ! delante. *Hay que borrarla*."
+            + "\n\t - El bot responde a *todos* los mensajes."
+            + "\n\t - Las semanas de GP comienzan el *martes* y terminan el *lunes* (incluidos)."
             + "\n\t - Al comienzo de la sesión ya no se admiten más predicciones."
             + "\n\t - Al comienzo de cada sesión se envían automáticamente todas las predicciones hechas."
             + "\n\t - Los martes a las 9.30h se envían automáticamente los horarios del GP."

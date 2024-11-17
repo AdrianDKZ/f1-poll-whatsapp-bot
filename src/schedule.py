@@ -1,5 +1,5 @@
 import threading, time
-from datetime import datetime
+import datetime as dt
 from scheduler import Scheduler
 from scheduler.trigger import Tuesday, Friday
 
@@ -24,7 +24,7 @@ def session_scheduler():
     if isinstance(times_info, str):
         return
     for session in times_info[1]:
-        session_dt = datetime.strptime(session[2], '%Y-%m-%d %H:%M:%S')
+        session_dt = dt.datetime.strptime(session[2], '%Y-%m-%d %H:%M:%S')
         schedule.once(session_dt, print_poll, kwargs={"session_id": session[0]})
     
 def print_poll(session_id):
@@ -33,7 +33,7 @@ def print_poll(session_id):
 def schedule_runner(client_: NewClient):
     global schedule, client
     schedule, client = Scheduler(), client_
-    schedule.weekly(Tuesday(datetime.time(hour=9, minute=30)), race_week)
+    schedule.weekly(Tuesday(dt.time(9, 30)), race_week)
     schedule.weekly(Friday(), session_scheduler)
     while True:
         schedule.exec_jobs()

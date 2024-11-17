@@ -7,3 +7,4 @@ services:
     build: .
     volumes:
     - ./src/database:/app/database
+    restart: unless-stopped
