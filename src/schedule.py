@@ -1,13 +1,23 @@
 import threading, time
 from datetime import datetime
 from scheduler import Scheduler
-from scheduler.trigger import Friday
+from scheduler.trigger import Tuesday, Friday
 
 from neonize.client import NewClient
 from neonize.utils import build_jid
 
 import commit_database
-import constants
+from constants import CHAT_ID
+from commands import format_times
+
+def send_message(message):
+    client.send_message(build_jid(CHAT_ID, "g.us"), message)
+
+def race_week():
+    times_info = commit_database.obtain_times()
+    if isinstance(times_info, str):
+        return
+    send_message(format_times(times_info))
 
 def session_scheduler():
     times_info = commit_database.obtain_times()
@@ -18,11 +28,12 @@ def session_scheduler():
         schedule.once(session_dt, print_poll, kwargs={"session_id": session[0]})
     
 def print_poll(session_id):
-    client.send_message(build_jid(constants.CHAT_ID, "g.us"), (commit_database.obtain_polls(session_id)))
+    send_message(commit_database.obtain_polls(session_id))
 
 def schedule_runner(client_: NewClient):
     global schedule, client
     schedule, client = Scheduler(), client_
+    schedule.weekly(Tuesday(datetime.time(hour=9, minute=30)), race_week)
     schedule.weekly(Friday(), session_scheduler)
     while True:
         schedule.exec_jobs()

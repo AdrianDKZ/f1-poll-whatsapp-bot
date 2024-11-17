@@ -29,8 +29,9 @@ class MessageObj():
         self.client.send_message(build_jid(constants.CHAT_ID, server="g.us"), message)
 
 def show_help(msg: MessageObj):
-    msg.reply("!Comandos whatsapp-milf-bot:" 
+    msg.reply("!Comandos _whatsapp-milf-bot_:" 
             + "\n\t*#Ayuda* - Comandos del bot"
+            + "\n\t*#Tips* - Funcionamiento del bot"
             + "\n\t*#Horario* - Horarios del GP actual"
             + "\n\t*#Porra* - Clasificación de la porra"
             + "\n\t*#SQualy* - Indica tus predicciones para la clasificación sprint"
@@ -39,17 +40,24 @@ def show_help(msg: MessageObj):
             + "\n\t*#Carrera* - Indica tus predicciones para la carrera"
             + f"\n\t*#Resultado _{constants.SESSIONS_STR}_* - Guarda los resultados de la sesión indicada"
             + f"\n\t*#Plantilla _{constants.SESSIONS_STR}_* - Obtiene la plantilla de la sesión indicada")
+    
+def show_tips(msg: MessageObj):
+    msg.reply("!Funcionamiento de _whatsapp-milf-bot_:"
+            + "\n\t - El bot detecta sólo los mensajes que empiezan por #"
+            + "\n\t - Las plantillas se envían con una ! delante. Hay que borrarla."
+            + "\n\t - Las semanas de GP comienzan el martes y terminan el lunes (incluidos)."
+            + "\n\t - Al comienzo de la sesión ya no se admiten más predicciones."
+            + "\n\t - Al comienzo de cada sesión se envían automáticamente todas las predicciones hechas."
+            + "\n\t - Los martes a las 9.30h se envían automáticamente los horarios del GP."
+            + "\n\t - Para los comandos _#resultado_ y _#plantilla_ se necesita indicar la sesión."
+            + "\n\t - Las sesiones se indentifican como _squaly_, _sprint_, _qualy_ y _carrera_.")
 
 def show_times(msg: MessageObj):
     times_info = commit_database.obtain_times()
     if isinstance(times_info, str):
         msg.reply(times_info)
     else:
-        format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
-
-        ## GP_Name + [session_name: session_date session_time]
-        msg.reply(f"*{times_info[0]}*\n" + 
-                "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in times_info[1]))   
+        msg.reply(format_times(times_info))   
 
 def show_poll(msg: MessageObj):
     msg.reply(commit_database.poll_points())
@@ -85,6 +93,12 @@ def set_poll(msg: MessageObj):
     else:
         msg.reply(commit_database.store_poll(prediction, session, msg.user))
 
+def format_times(times_info):
+    format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
+    ## GP_Name + [session_name: session_date session_time]
+    return (f"*{times_info[0]}*\n" + 
+                "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in times_info[1]))
+
 def parse_prediction(msg: list, session: str):
     ## Parse lines to obtain prediction
     prediction = {}
@@ -106,6 +120,7 @@ def parse_prediction(msg: list, session: str):
 
 INDEXER = {
     "ayuda": show_help,
+    "tips": show_tips,
     "horario": show_times,
     "qualy": set_poll,
     "carrera": set_poll,
