@@ -86,7 +86,7 @@ def obtain_polls(session_id):
     gp_id, session_type = cursor.fetchone()
     cursor.execute("SELECT name FROM gp WHERE id = ?", (gp_id,))
     gp_name = cursor.fetchone()[0]
-    preds_str = f"*{gp_name}* \n _{session_type.capitalize()}_"
+    preds_str = f"! *{gp_name}* \n _{session_type.capitalize()}_"
     for prediction in session_predictions(session_id):
         user = obtain_user(prediction[2])
         pred = json.loads(prediction[3])

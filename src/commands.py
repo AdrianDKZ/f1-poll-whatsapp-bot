@@ -43,13 +43,14 @@ def show_help(msg: MessageObj):
     
 def show_tips(msg: MessageObj):
     msg.reply("!Funcionamiento de _whatsapp-milf-bot_:"
-            + "\n\t - El bot *solo* detecta los mensajes que empiezan por #"
-            + "\n\t - Las plantillas se envían con una ! delante. *Hay que borrarla*."
-            + "\n\t - El bot responde a *todos* los mensajes."
+            + "\n\t - El bot *solo* detecta los mensajes que empiezan por *#*"
+            + "\n\t - Las plantillas se envían con una *!* delante. *Hay que borrarla*."
+            + "\n\t - El bot responde a *todos* los mensajes. *Comprueba la #*."
             + "\n\t - Las semanas de GP comienzan el *martes* y terminan el *lunes* (incluidos)."
+            + "\n\t - Los martes a las 9.30h se envían automáticamente los horarios del GP."
             + "\n\t - Al comienzo de la sesión ya no se admiten más predicciones."
             + "\n\t - Al comienzo de cada sesión se envían automáticamente todas las predicciones hechas."
-            + "\n\t - Los martes a las 9.30h se envían automáticamente los horarios del GP."
+            + "\n\t - El bot detecta qué persona ha mandado la predicción."
             + "\n\t - Para los comandos _#resultado_ y _#plantilla_ se necesita indicar la sesión."
             + "\n\t - Las sesiones se indentifican como _squaly_, _sprint_, _qualy_ y _carrera_.")
 
@@ -97,7 +98,7 @@ def set_poll(msg: MessageObj):
 def format_times(times_info):
     format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
     ## GP_Name + [session_name: session_date session_time]
-    return (f"*{times_info[0]}*\n" + 
+    return (f"! *{times_info[0]}*\n" + 
                 "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in times_info[1]))
 
 def parse_prediction(msg: list, session: str):
