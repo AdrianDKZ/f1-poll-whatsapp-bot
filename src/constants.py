@@ -1,6 +1,10 @@
-CHAT_ID = "120363021965478012" ### GRUPO  
+CHAT_ID = "120363349774885451" ### PRUEBAS  
 ## ID Pruebas: "120363349774885451" 
 ## ID Grupo:"120363021965478012"
+
+DB_PATH = 'database/Porra2024_test.sqlite3'
+## Grupo: 'database/Porra2024.sqlite3'
+## Pruebas: 'database/Porra2024_test.sqlite3'
     
 PILOTS = {
     "HAM": ["lewis", "hamilton", "ham"],
@@ -25,11 +29,6 @@ PILOTS = {
     "MAG": ["kevin", "magunussen", "mag"]
 }
 
-ERRORS = {
-    "GP404": "!No se ha encontrado ningun GP activo en la fecha de hoy",
-    "SES404": "!La sesión indicada no se encuentra"
-}
-
 TEMPLATE = {
     "squaly":  "1- ",
     "sprint":  "1- ",
@@ -39,3 +38,9 @@ TEMPLATE = {
 
 SESSIONS = ["squaly", "sprint", "qualy", "carrera"]
 SESSIONS_STR = '[' + ', '.join(SESSIONS) + ']'
+
+ERRORS = {
+    "NoGP": "!No se ha encontrado ningun GP activo en la fecha de hoy",
+    "NoSession": "!La sesión indicada no se encuentra",
+    "subcmd": f"!El comando indicado requiere indicar la sesión: _{SESSIONS_STR}_"
+}

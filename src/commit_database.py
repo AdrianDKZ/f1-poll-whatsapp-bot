@@ -8,7 +8,7 @@ locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
 def connect_sql():
     global conn, cursor
-    conn = sqlite3.connect('database/Porra2024.sqlite3')
+    conn = sqlite3.connect(constants.DB_PATH)
     cursor = conn.cursor()
 
 def current_gp():
@@ -55,10 +55,10 @@ def common_checks(session, get_session):
     ## Get current Grand Prix and the GP Session
     gp_id = current_gp()
     if not gp_id:
-        return "!No se ha encontrado ningun GP activo a fecha de hoy"
+        return constants.ERRORS["NoGP"]
     session_id = get_session(gp_id[0], session)
     if not session_id:
-        return "!La sesión indicada no se encuentra"
+        return constants.ERRORS["NoSession"]
     return session_id[0]
 
 def store_poll(prediction, session, user):
@@ -79,14 +79,15 @@ def store_poll(prediction, session, user):
     conn.commit()
     return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
 
-def obtain_polls(session_id):
+def obtain_polls(session):
     connect_sql()
+    session_id = common_checks(session, current_session) if isinstance(session, str) else session
     ## Obtain session info
     cursor.execute("SELECT gp_id, type FROM sessions WHERE id = ?", (session_id,))
     gp_id, session_type = cursor.fetchone()
     cursor.execute("SELECT name FROM gp WHERE id = ?", (gp_id,))
     gp_name = cursor.fetchone()[0]
-    preds_str = f"! *{gp_name}* \n _{session_type.capitalize()}_"
+    preds_str = f"*!{gp_name}* \n _{session_type.capitalize()}_"
     for prediction in session_predictions(session_id):
         user = obtain_user(prediction[2])
         pred = json.loads(prediction[3])
@@ -139,7 +140,7 @@ def obtain_times():
     ## Get current Grand Prix and the GP Session
     gp_id = current_gp()
     if not gp_id:
-        return constants.ERRORS["GP404"]
+        return constants.ERRORS["NoGP"]
     sessions = all_sessions(gp_id[0])
     return gp_id[1], sessions
 

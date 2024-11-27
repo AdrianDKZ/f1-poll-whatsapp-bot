@@ -33,13 +33,14 @@ def show_help(msg: MessageObj):
             + "\n\t*#Ayuda* - Comandos del bot"
             + "\n\t*#Tips* - Funcionamiento del bot"
             + "\n\t*#Horario* - Horarios del GP actual"
-            + "\n\t*#Porra* - Clasificación de la porra"
+            + "\n\t*#Clasificacion* - Clasificación de la porra"
             + "\n\t*#SQualy* - Indica tus predicciones para la clasificación sprint"
             + "\n\t*#Sprint* - Indica tus predicciones para la carrera sprint"
             + "\n\t*#Qualy*  - Indica tus predicciones para la clasificación"
             + "\n\t*#Carrera* - Indica tus predicciones para la carrera"
             + f"\n\t*#Resultado _{constants.SESSIONS_STR}_* - Guarda los resultados de la sesión indicada"
-            + f"\n\t*#Plantilla _{constants.SESSIONS_STR}_* - Obtiene la plantilla de la sesión indicada")
+            + f"\n\t*#Plantilla _{constants.SESSIONS_STR}_* - Obtiene la plantilla de la sesión indicada"
+            + f"\n\t*#Porra _{constants.SESSIONS_STR}_* - Muestra las predicciones de la sesión indicada")
     
 def show_tips(msg: MessageObj):
     msg.reply("!Funcionamiento de _whatsapp-milf-bot_:"
@@ -61,7 +62,7 @@ def show_times(msg: MessageObj):
     else:
         msg.reply(format_times(times_info))   
 
-def show_poll(msg: MessageObj):
+def show_class(msg: MessageObj):
     msg.reply(commit_database.poll_points())
     msg.reply(commit_database.team_points())
 
@@ -72,11 +73,15 @@ def show_template(msg: MessageObj):
         template = f"!Indica *#Plantilla {constants.SESSIONS_STR}* para obtener la plantilla de la sesión deseada"
     msg.reply(template)
 
+def show_preds(msg: MessageObj):
+    if msg.subcommand not in constants.SESSIONS:
+        msg.reply(constants.ERRORS["subcmd"])
+    msg.reply(commit_database.obtain_polls(msg.subcommand))
+
 def set_poll(msg: MessageObj):
     ## Check if results command is properly executed
     if msg.command == "resultado" and msg.subcommand not in constants.SESSIONS:
-        msg.reply(f"!Recuerda indicar la sesión deseada de la siguiente forma: *#Resultado {constants.SESSIONS_STR}*"
-                  + f"\nEjecuta *#Plantilla {constants.SESSIONS_STR}* para obtener la plantilla de la sesión deseada.")
+        msg.reply(constants.ERRORS["subcmd"] + f"\nEjecuta *#Plantilla {constants.SESSIONS_STR}* para obtener la plantilla de la sesión deseada.")
         return
     
     ## Parse prediction and finish if error
@@ -84,8 +89,9 @@ def set_poll(msg: MessageObj):
     prediction = parse_prediction(msg.input, session)
     if isinstance(prediction, str):
         msg.reply(prediction)
-        if prediction.startswith("!Plantilla"):
-            msg.send(f"!#{msg.command.capitalize()}\n{constants.TEMPLATE[msg.command]}")
+        if "formato" in prediction:
+            subcommand = "" if msg.subcommand == None else session
+            msg.send(f"!#{msg.command.capitalize()} {subcommand}\n{constants.TEMPLATE[session]}")
         return
     
     if msg.command == "resultado":
@@ -98,7 +104,7 @@ def set_poll(msg: MessageObj):
 def format_times(times_info):
     format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
     ## GP_Name + [session_name: session_date session_time]
-    return (f"! *{times_info[0]}*\n" + 
+    return (f"*!{times_info[0]}*\n" + 
                 "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in times_info[1]))
 
 def parse_prediction(msg: list, session: str):
@@ -106,13 +112,25 @@ def parse_prediction(msg: list, session: str):
     prediction = {}
     for line in msg:
         try:
+            ## Split lines by hyphon to obtain POSITION - PILOT or ALO - POSITION
             line_info = line.split("-")
+            ## Process ALO position deleting possible strings
             if "alo" in line_info[0]:
                 prediction["ALO"] = re.sub("[a-zA-Z]+", "", line_info[1]).replace(" ", "")
             else:
-                prediction[line_info[0]] = next((pilot_id for pilot_id, pilot_names in constants.PILOTS.items() if line_info[1].replace(" ", "") in pilot_names))
-        except (StopIteration, ValueError):
-            return f"!Error en el procesamiento de _{line}_"
+                ## Loop pilots till find the indicated
+                isPilot = False
+                for pilot_id, pilot_names in constants.PILOTS.items():
+                    if line_info[1].replace(" ", "") in pilot_names:
+                        isPilot = True
+                        break
+                ## If pilot not found, display pilot error
+                if not isPilot:
+                    return f"!Piloto {line_info[1]} no encontrado"
+                prediction[line_info[0]] = pilot_id
+        ## If any other error, display processing error
+        except Exception as e:
+            return f"!Error procesando la predicción. Usa el siguiente formato:"
     ## Check the obtained elements are equals to the indicated on the session template    
     session_template = constants.TEMPLATE[session].replace("- ", "").split("\n")
     if sorted(session_template) != sorted(prediction.keys()):
@@ -130,5 +148,6 @@ INDEXER = {
     "squaly": set_poll,
     "resultado": set_poll,
     "plantilla": show_template,
-    "porra": show_poll
+    "porra": show_preds,
+    "clasificacion": show_class
 }
