@@ -35,6 +35,9 @@ def schedule_runner(client_: NewClient):
     schedule, client = Scheduler(), client_
     schedule.weekly(Tuesday(dt.time(9, 30)), race_week)
     schedule.weekly(Friday(), session_scheduler)
+    if dt.date.today().weekday() >= 4:
+        session_scheduler()
+    print(schedule, flush=True)
     while True:
         schedule.exec_jobs()
         time.sleep(1)

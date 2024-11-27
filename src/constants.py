@@ -1,15 +1,15 @@
-CHAT_ID = "120363349774885451" ### PRUEBAS  
+CHAT_ID = "120363021965478012" ### GRUPO  
 ## ID Pruebas: "120363349774885451" 
 ## ID Grupo:"120363021965478012"
 
-DB_PATH = 'database/Porra2024_test.sqlite3'
+DB_PATH = 'database/Porra2024.sqlite3'
 ## Grupo: 'database/Porra2024.sqlite3'
 ## Pruebas: 'database/Porra2024_test.sqlite3'
     
 PILOTS = {
     "HAM": ["lewis", "hamilton", "ham"],
     "RUS": ["george", "russell", "rus"],
-    "VER": ["max", "verstappen", "ver"],
+    "VER": ["max", "verstappen", "ver", "mierdstapen"],
     "PER": ["sergio", "perez", "per"],
     "LEC": ["charles", "leclerc", "lec"],
     "SAI": ["carlos", "sainz", "sai"],
