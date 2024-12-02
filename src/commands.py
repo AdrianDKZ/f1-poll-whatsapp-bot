@@ -113,20 +113,20 @@ def parse_prediction(msg: list, session: str):
     for line in msg:
         try:
             ## Split lines by hyphon to obtain POSITION - PILOT or ALO - POSITION
-            line_info = line.split("-")
+            line_info = line.replace(" ", "").split("-")
             ## Process ALO position deleting possible strings
             if "alo" in line_info[0]:
-                prediction["ALO"] = re.sub("[a-zA-Z]+", "", line_info[1]).replace(" ", "")
+                prediction["ALO"] = re.sub("[a-zA-Z]+", "", line_info[1])
             else:
                 ## Loop pilots till find the indicated
                 isPilot = False
                 for pilot_id, pilot_names in constants.PILOTS.items():
-                    if line_info[1].replace(" ", "") in pilot_names:
+                    if line_info[1] in pilot_names:
                         isPilot = True
                         break
                 ## If pilot not found, display pilot error
                 if not isPilot:
-                    return f"!Piloto {line_info[1]} no encontrado"
+                    return f"!Piloto *_{line_info[1]}_* no encontrado"
                 prediction[line_info[0]] = pilot_id
         ## If any other error, display processing error
         except Exception as e:

@@ -153,8 +153,9 @@ def get_points(prediction, results, session):
         if prediction[position] == pilot:
             points += 1
         ## Strike to false if fail at a numeric position or not a race
-        elif position != "ALO" or session != "carrera":
+        elif position != "ALO":
             strike = 0
     ## Two extra points if strike
+    strike = 0 if session != "carrera" else strike
     points += 2 if strike else 0
     return points, strike

@@ -25,7 +25,8 @@ def session_scheduler():
         return
     for session in times_info[1]:
         session_dt = dt.datetime.strptime(session[2], '%Y-%m-%d %H:%M:%S')
-        schedule.once(session_dt, print_poll, kwargs={"session_id": session[0]})
+        if session_dt > dt.datetime.now():
+            schedule.once(session_dt, print_poll, kwargs={"session_id": session[0]})
     
 def print_poll(session_id):
     send_message(commit_database.obtain_polls(session_id))

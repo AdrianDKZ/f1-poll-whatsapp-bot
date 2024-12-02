@@ -9,7 +9,7 @@ DB_PATH = 'database/Porra2024.sqlite3'
 PILOTS = {
     "HAM": ["lewis", "hamilton", "ham"],
     "RUS": ["george", "russell", "rus"],
-    "VER": ["max", "verstappen", "ver", "mierdstapen"],
+    "VER": ["max", "verstappen", "ver", "mierdstappen"],
     "PER": ["sergio", "perez", "per"],
     "LEC": ["charles", "leclerc", "lec"],
     "SAI": ["carlos", "sainz", "sai"],
