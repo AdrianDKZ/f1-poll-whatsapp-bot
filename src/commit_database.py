@@ -1,7 +1,7 @@
 import sqlite3, json, datetime
 import locale
 
-import constants
+import constants, utils
 
 # Set the Spanish locale
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
@@ -63,7 +63,7 @@ def common_checks(session, get_session):
 
 def store_poll(prediction, session, user):
     session_id = common_checks(session, current_session)
-    if isinstance(session_id, str):
+    if utils.isError(session_id):
         return session_id
     
     user_id = obtain_user(user)[0]
@@ -77,7 +77,12 @@ def store_poll(prediction, session, user):
     else:
         cursor.execute("UPDATE predictions SET prediction = ? WHERE id = ?", (json.dumps(prediction), db_entry[0]))
     conn.commit()
-    return "!Predicción actualizada" if db_entry else "!Prediccion guardada"
+
+    cursor.execute("SELECT datetime FROM sessions WHERE id = ?", (session_id, ))
+    session_time = utils.dt_to_msg(cursor.fetchone()[0])
+
+    response = "!Predicción actualizada" if db_entry else "!Prediccion guardada"
+    return f"{response} \nLímite porra: {session_time}"
 
 def obtain_polls(session):
     connect_sql()
@@ -97,7 +102,7 @@ def obtain_polls(session):
 
 def prediction_points(results, session):
     session_id = common_checks(session, gp_session)
-    if isinstance(session_id, str):
+    if utils.isError(session_id):
         return session_id   
     ## Store session results
     store_results(results, session_id)

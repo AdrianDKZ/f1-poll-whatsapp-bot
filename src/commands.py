@@ -1,11 +1,9 @@
-import re, datetime
+import re
 
 from neonize.client import NewClient
 from neonize.events import MessageEv
-from neonize.utils import build_jid
 
-import constants
-import commit_database
+import constants, commit_database, utils
 
 class MessageObj():
     def __init__(self, client: NewClient, message: MessageEv, user, text):
@@ -26,7 +24,7 @@ class MessageObj():
         self.client.reply_message(response, self.message)
 
     def send(self, message):
-        self.client.send_message(build_jid(constants.CHAT_ID, server="g.us"), message)
+        self.client.send_message(utils.build_msg(), message)
 
 def show_help(msg: MessageObj):
     msg.reply("!Comandos _whatsapp-milf-bot_:" 
@@ -57,7 +55,7 @@ def show_tips(msg: MessageObj):
 
 def show_times(msg: MessageObj):
     times_info = commit_database.obtain_times()
-    if isinstance(times_info, str):
+    if utils.isError(times_info):
         msg.reply(times_info)
     else:
         msg.reply(format_times(times_info))   
@@ -87,7 +85,7 @@ def set_poll(msg: MessageObj):
     ## Parse prediction and finish if error
     session = msg.subcommand if msg.command == "resultado" else msg.command
     prediction = parse_prediction(msg.input, session)
-    if isinstance(prediction, str):
+    if utils.isError(prediction):
         msg.reply(prediction)
         if "formato" in prediction:
             subcommand = "" if msg.subcommand == None else session
@@ -102,10 +100,9 @@ def set_poll(msg: MessageObj):
         msg.reply(commit_database.store_poll(prediction, session, msg.user))
 
 def format_times(times_info):
-    format_datetime = lambda date: datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%A %d, %H:%M').capitalize()
     ## GP_Name + [session_name: session_date session_time]
     return (f"*!{times_info[0]}*\n" + 
-                "\n".join(f"{session[3].capitalize()}: _{format_datetime(session[2])}_" for session in times_info[1]))
+                "\n".join(f"{session[3].capitalize()}: _{utils.dt_to_msg(session[2])}_" for session in times_info[1]))
 
 def parse_prediction(msg: list, session: str):
     ## Parse lines to obtain prediction

@@ -13,5 +13,6 @@ COPY src/commit_database.py .
 COPY src/constants.py .
 COPY src/main.py .
 COPY src/schedule.py .
+COPY src/utils.py .
 
 CMD ["python", "main.py"]

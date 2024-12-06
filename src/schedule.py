@@ -1,30 +1,27 @@
-import threading, time
-import datetime as dt
+import datetime as dt, time
 from scheduler import Scheduler
 from scheduler.trigger import Tuesday, Friday
 
 from neonize.client import NewClient
-from neonize.utils import build_jid
 
-import commit_database
-from constants import CHAT_ID
-from commands import format_times
+import commit_database, utils
 
 def send_message(message):
-    client.send_message(build_jid(CHAT_ID, "g.us"), message)
+    client.send_message(utils.build_msg(), message)
 
 def race_week():
     times_info = commit_database.obtain_times()
-    if isinstance(times_info, str):
+    if utils.isError(times_info):
         return
+    from commands import format_times    
     send_message(format_times(times_info))
 
 def session_scheduler():
     times_info = commit_database.obtain_times()
-    if isinstance(times_info, str):
+    if utils.isError(times_info):
         return
     for session in times_info[1]:
-        session_dt = dt.datetime.strptime(session[2], '%Y-%m-%d %H:%M:%S')
+        session_dt = utils.str_to_dt(session[2])
         if session_dt > dt.datetime.now():
             schedule.once(session_dt, print_poll, kwargs={"session_id": session[0]})
     
