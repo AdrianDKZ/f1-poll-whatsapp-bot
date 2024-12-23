@@ -1,32 +1,42 @@
-CHAT_ID = "120363021965478012" ### GRUPO  
-## ID Pruebas: "120363349774885451" 
-## ID Grupo:"120363021965478012"
+CHAT_ID = "120363021965478012" ### GRUPO
+## ID Grupo: "120363021965478012" ### GRUPO
+## ID Pruebas: "120363349774885451" ### PRUEBAS
 
-DB_PATH = 'database/Porra2024.sqlite3'
-## Grupo: 'database/Porra2024.sqlite3'
-## Pruebas: 'database/Porra2024_test.sqlite3'
+DB_PATH = 'database/Porra2024.sqlite3' ### GRUPO
+## Grupo: 'database/Porra2024.sqlite3' ### GRUPO
+## Pruebas: 'database/Porra2024_test.sqlite3' ### PRUEBAS
     
 PILOTS = {
-    "HAM": ["lewis", "hamilton", "ham"],
-    "RUS": ["george", "russell", "rus"],
+    ## RedBull
     "VER": ["max", "verstappen", "ver", "mierdstappen"],
-    "PER": ["sergio", "perez", "per"],
-    "LEC": ["charles", "leclerc", "lec"],
-    "SAI": ["carlos", "sainz", "sai"],
+    "LAW": ["liam", "lawson", "law"],
+    ## Mclaren
     "NOR": ["lando", "norris", "nor"],
     "PIA": ["oscar", "piastri", "pia"],
-    "OCO": ["esteban", "ocon", "oco"],
-    "GAS": ["pierre", "gasly", "gas"],
-    "ALB": ["alexander", "albon", "alb"],
-    "COL": ["franco", "colapinto", "col"],
-    "TSU": ["yuki", "tsunoda", "tsu"],
-    "LAW": ["liam", "lawson", "law"],
-    "ZHO": ["guanyu", "zhou", "zho"],
-    "BOT": ["valtteri", "bottas", "bot"],
+    ## Ferrari
+    "HAM": ["lewis", "hamilton", "ham"],
+    "LEC": ["charles", "leclerc", "lec"],
+    ## Mercedes
+    "RUS": ["george", "russell", "rus"],
+    "ANT": ["kimi", "antonelli", "ant"],
+    ## Aston Martin
     "ALO": ["fernando", "alonso", "alo", "nano", "magic"],
     "STR": ["lance", "stroll", "str"],
+    ## Alpine
+    "GAS": ["pierre", "gasly", "gas"],
+    "DOO": ["jack", "doohan", "doo"],
+    ## Williams
+    "SAI": ["carlos", "sainz", "sai"],
+    "ALB": ["alexander", "albon", "alb"],
+    ## Haas
+    "OCO": ["esteban", "ocon", "oco"],
+    "BEA": ["oliver", "bearman", "bea"],
+    ## Sauber    
     "HUL": ["nico", "hulkenberg", "hul"],
-    "MAG": ["kevin", "magunussen", "mag"]
+    "BOR": ["gabriel", "bortoleto", "bor"],
+    ## Racing Bulls
+    "TSU": ["yuki", "tsunoda", "tsu"],
+    "HAD": ["isack", "hadjar", "had"],
 }
 
 TEMPLATE = {
