@@ -1,2 +1,5 @@
 neonize==0.3.4
 scheduler
+ics
+pytz
+sqlmodel
