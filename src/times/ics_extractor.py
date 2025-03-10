@@ -2,18 +2,18 @@ from ics import Calendar
 import datetime as dt
 import pytz, re
 
-from ..database import database as db
+from ..database import model as db
 from sqlmodel import select, Session
 
 
 categories = {
-            "Entrenamientos Libres 1": db.Session_Type.LIBRES.value, 
-            "Entrenamientos Libres 2": db.Session_Type.LIBRES.value,
-            "Entrenamientos Libres 3": db.Session_Type.LIBRES.value, 
-            "Clasificación": db.Session_Type.QUALY.value, 
-            "Gran Premio": db.Session_Type.CARRERA.value,
-            "Sprint Qualifying": db.Session_Type.SQUALY.value, 
-            "Sprint": db.Session_Type.SPRINT.value}
+            "Entrenamientos Libres 1": db.Session_Type.libres.value, 
+            "Entrenamientos Libres 2": db.Session_Type.libres.value,
+            "Entrenamientos Libres 3": db.Session_Type.libres.value, 
+            "Clasificación": db.Session_Type.qualy.value, 
+            "Gran Premio": db.Session_Type.carrera.value,
+            "Sprint Qualifying": db.Session_Type.squaly.value, 
+            "Sprint": db.Session_Type.sprint.value}
 
 
 ics_file = "src/times/f1-calendar_p1_p2_p3_qualifying_sprint_gp.ics"

@@ -2,10 +2,10 @@ from neonize.client import NewClient
 from neonize.events import ConnectedEv, MessageEv, PairStatusEv, event
 from neonize.types import MessageServerID
 
-from commands import INDEXER, MessageObj
-from constants import CHAT_ID
-from commit_database import store_user
-from schedule import schedule_runner
+from .commands import INDEXER, MessageObj
+from .constants import CHAT_ID
+from .database.actions import store_user
+from .schedule import schedule_runner
 
 import threading
 

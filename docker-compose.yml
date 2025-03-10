@@ -6,7 +6,7 @@ services:
   milf-bot:
     build: .
     volumes:
-    - ./src/database:/app/database
+    - ./database:/app/database
     - "/etc/timezone:/etc/timezone:ro"
     - "/etc/localtime:/etc/localtime:ro"
     restart: unless-stopped

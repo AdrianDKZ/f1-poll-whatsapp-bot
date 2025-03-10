@@ -3,7 +3,9 @@ import re
 from neonize.client import NewClient
 from neonize.events import MessageEv
 
-import constants, commit_database, utils
+from .database import actions
+
+from . import constants, utils
 
 class MessageObj():
     def __init__(self, client: NewClient, message: MessageEv, user, text):
@@ -54,15 +56,16 @@ def show_tips(msg: MessageObj):
             + "\n\t - Las sesiones se indentifican como _squaly_, _sprint_, _qualy_ y _carrera_.")
 
 def show_times(msg: MessageObj):
-    times_info = commit_database.obtain_times()
+    times_info = actions.obtain_gp_times()
+    print(times_info)
     if utils.isError(times_info):
         msg.reply(times_info)
     else:
         msg.reply(format_times(times_info))   
 
 def show_class(msg: MessageObj):
-    msg.reply(commit_database.poll_points())
-    msg.reply(commit_database.team_points())
+    msg.reply(actions.obtain_user_points())
+    msg.reply(actions.obtain_team_points())
 
 def show_template(msg: MessageObj):
     if msg.subcommand in constants.TEMPLATE.keys():
@@ -74,7 +77,7 @@ def show_template(msg: MessageObj):
 def show_preds(msg: MessageObj):
     if msg.subcommand not in constants.SESSIONS:
         msg.reply(constants.ERRORS["subcmd"])
-    msg.reply(commit_database.obtain_polls(msg.subcommand))
+    msg.reply(actions.obtain_polls(msg.subcommand))
 
 def set_poll(msg: MessageObj):
     ## Check if results command is properly executed
@@ -93,16 +96,16 @@ def set_poll(msg: MessageObj):
         return
     
     if msg.command == "resultado":
-        msg.reply(commit_database.prediction_points(prediction, session))
-        msg.send(commit_database.poll_points())
-        msg.send(commit_database.team_points())
+        msg.reply(actions.prediction_points(prediction, session))
+        msg.send(actions.obtain_user_points())
+        msg.send(actions.obtain_team_points())
     else:
-        msg.reply(commit_database.store_poll(prediction, session, msg.user))
+        msg.reply(actions.store_poll(prediction, session, msg.user))
 
 def format_times(times_info):
     ## GP_Name + [session_name: session_date session_time]
-    return (f"*!{times_info[0]}*\n" + 
-                "\n".join(f"{session[3].capitalize()}: _{utils.dt_to_msg(session[2])}_" for session in times_info[1]))
+    return (f"*!GP de {times_info[0]}*\n" + 
+                "\n".join(f"{session.type.value.capitalize()}: _{utils.dt_to_msg(session.datetime)}_" for session in times_info[1]))
 
 def parse_prediction(msg: list, session: str):
     ## Parse lines to obtain prediction

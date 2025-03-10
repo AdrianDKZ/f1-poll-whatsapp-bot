@@ -1,10 +1,6 @@
 CHAT_ID = "120363021965478012" ### GRUPO
 ## ID Grupo: "120363021965478012" ### GRUPO
 ## ID Pruebas: "120363349774885451" ### PRUEBAS
-
-DB_PATH = 'database/Porra2024.sqlite3' ### GRUPO
-## Grupo: 'database/Porra2024.sqlite3' ### GRUPO
-## Pruebas: 'database/Porra2024_test.sqlite3' ### PRUEBAS
     
 PILOTS = {
     ## RedBull
@@ -25,6 +21,7 @@ PILOTS = {
     ## Alpine
     "GAS": ["pierre", "gasly", "gas"],
     "DOO": ["jack", "doohan", "doo"],
+    "COL": ["franco", "colapinto", "col"],
     ## Williams
     "SAI": ["carlos", "sainz", "sai"],
     "ALB": ["alexander", "albon", "alb"],

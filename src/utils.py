@@ -1,11 +1,8 @@
 import datetime as dt
-import constants
-
-def str_to_dt(datetime):
-    return dt.datetime.strptime(datetime, '%Y-%m-%d %H:%M:%S')
+from . import constants
 
 def dt_to_msg(datetime):
-    return str_to_dt(datetime).strftime('%A %d, %H:%M').capitalize()
+    return datetime.strftime('%A %d, %H:%M').capitalize()
 
 def isError(msg):
     return True if isinstance(msg, str) else False
