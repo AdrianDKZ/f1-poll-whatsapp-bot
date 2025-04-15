@@ -5,7 +5,7 @@ from scheduler.trigger import Tuesday, Friday
 from neonize.client import NewClient
 
 from .database import actions
-
+from .commands import format_times    
 from . import utils
 
 def send_message(message):
@@ -15,7 +15,6 @@ def race_week():
     times_info = actions.obtain_gp_times()
     if utils.isError(times_info):
         return
-    from commands import format_times    
     send_message(format_times(times_info))
 
 def session_scheduler():
@@ -25,6 +24,7 @@ def session_scheduler():
     for session in times_info[1]:
         if session.datetime > dt.datetime.now():
             schedule.once(session.datetime, print_poll, kwargs={"session_id": session.id})
+    print(schedule, flush=True)
     
 def print_poll(session_id):
     send_message(actions.obtain_polls(session_id))
