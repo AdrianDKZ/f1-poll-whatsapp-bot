@@ -1,6 +1,10 @@
 CHAT_ID = "120363021965478012" ### GRUPO
 ## ID Grupo: "120363021965478012" ### GRUPO
 ## ID Pruebas: "120363349774885451" ### PRUEBAS
+
+DATABASE = "Porra2025.db" ## GRUPO
+# "Porra2025.db" ## GRUPO
+# "Porra2024_test.db" ## PRUEBAS
     
 PILOTS = {
     ## RedBull
@@ -42,6 +46,8 @@ TEMPLATE = {
     "qualy":   "1- \nALO- ",
     "carrera": "1- \n2- \n3- \nALO- "    
 }
+
+SPOILER_STR = '\u200B' * 4000
 
 SESSIONS = ["squaly", "sprint", "qualy", "carrera"]
 SESSIONS_STR = '[' + ', '.join(SESSIONS) + ']'

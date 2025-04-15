@@ -94,7 +94,7 @@ def obtain_polls(session):
     db_session = retrieve_by_id(db.Sessions, session_id)
     db_race = retrieve_by_id(db.GP, db_session.gp_id)
 
-    preds_str = f"*!GP de {db_race.name}* \n _{db_session.type.value.capitalize()}_"
+    preds_str = f"*!GP de {db_race.name}* \n _{db_session.type.value.capitalize()}_" + constants.SPOILER_STR
     for prediction in obtain_session_preds(session_id):
         user = obtain_user(prediction.user_id)
         pred = json.loads(prediction.prediction)
@@ -105,7 +105,7 @@ def obtain_polls(session):
 def obtain_user_points():
     users: db.Users = retrieve_all(select(db.Users))
     users_lst = sorted(users, key=lambda x: (-x.points, -x.strikes))
-    return "*Porra Individual*\n" + "\n".join(f"{user.name} - {user.points} puntos ({user.strikes})" for user in users_lst)
+    return "*!Porra Individual*\n" + constants.SPOILER_STR + "\n".join(f"{user.name} - {user.points} puntos ({user.strikes})" for user in users_lst)
 
 
 def obtain_team_points():
@@ -114,7 +114,7 @@ def obtain_team_points():
         user1, user2 = obtain_user(team.user1), obtain_user(team.user2)
         teams_info.append(TeamPoints(name=team.name, user1=user1.name, user2=user2.name, points=user1.points+user2.points, strikes=user1.strikes+user2.strikes))
     teams_info = sorted(teams_info, key=lambda x: (-x.points, -x.strikes))
-    return "*Porra por Equipos*\n" + "\n".join(f"{team.name} ({team.user1} y {team.user2}) - {team.points} puntos ({team.strikes})" for team in teams_info)
+    return "*!Porra por Equipos*\n" + constants.SPOILER_STR + "\n".join(f"{team.name} ({team.user1} y {team.user2}) - {team.points} puntos ({team.strikes})" for team in teams_info)
 
 ### DATABASE WRITE ACTIONS 
 

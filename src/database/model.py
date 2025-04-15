@@ -3,6 +3,8 @@ from enum import Enum
 
 import datetime as dt
 
+from ..constants import DATABASE
+
 class Session_Type(Enum):
     libres = "libres"
     qualy = "qualy"
@@ -42,7 +44,7 @@ class Predictions(SQLModel, table=True):
     prediction: str
     points: int|None = None
 
-sqlite_file_name = "database/Porra2025.db"
+sqlite_file_name = f"database/{DATABASE}"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 engine = create_engine(sqlite_url, echo=True)

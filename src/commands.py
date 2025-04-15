@@ -29,7 +29,7 @@ class MessageObj():
         self.client.send_message(utils.build_msg(), message)
 
 def show_help(msg: MessageObj):
-    msg.reply("!Comandos _whatsapp-milf-bot_:" 
+    msg.reply("!Comandos _whatsapp-milf-bot_:" + constants.SPOILER_STR 
             + "\n\t*#Ayuda* - Comandos del bot"
             + "\n\t*#Tips* - Funcionamiento del bot"
             + "\n\t*#Horario* - Horarios del GP actual"
@@ -43,7 +43,7 @@ def show_help(msg: MessageObj):
             + f"\n\t*#Porra _{constants.SESSIONS_STR}_* - Muestra las predicciones de la sesión indicada")
     
 def show_tips(msg: MessageObj):
-    msg.reply("!Funcionamiento de _whatsapp-milf-bot_:"
+    msg.reply("!Funcionamiento de _whatsapp-milf-bot_:" + constants.SPOILER_STR 
             + "\n\t - El bot *solo* detecta los mensajes que empiezan por *#*"
             + "\n\t - Las plantillas se envían con una *!* delante. *Hay que borrarla*."
             + "\n\t - El bot responde a *todos* los mensajes. *Comprueba la #*."
